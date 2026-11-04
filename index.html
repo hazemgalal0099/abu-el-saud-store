@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>متجر أبو السعود | أكبر تشكيلة ملابس ومنتجات نون مصر</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['selector', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            noon: {
+              yellow: '#feee00',
+              yellowHover: '#e6d700',
+              black: '#1a1a1a',
+              dark: '#404553',
+              gray: '#7e859b',
+              lightGray: '#f7f7fa',
+              border: '#e3e6e8',
+              green: '#38ae04',
+              red: '#d8143a',
+              blue: '#0070e0'
+            },
+            whatsapp: {
+              DEFAULT: '#25d366',
+              dark: '#128c7e',
+              hover: '#1ebd5a'
+            }
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            tajawal: ['Tajawal', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom CSS (مع دعم الثيم والدارك مود) -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Vue 3 CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body class="antialiased select-none sm:select-auto">
+  <div id="app" v-cloak>
+
+    <!-- ==================== أعلى الصفحة: شريط الإعلانات الترويجي (Top Banner) ==================== -->
+    <header class="topbar-bg text-xs py-2 px-4 shadow-sm transition-colors duration-300">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-3">
+          <span class="btn-primary text-[11px] font-black px-2 py-0.5 rounded shadow-xs">
+            ⚡ عروض نون الكبرى
+          </span>
+          <span class="text-gray-300">
+            أهلاً بكم في <strong class="text-yellow-400">{{ storeConfig.storeName }}</strong> - تشكيلة ملابس وإلكترونيات نون بأسعارها الرسمية
+          </span>
+        </div>
+        <div class="flex items-center gap-4 text-gray-300">
+          <div class="flex items-center gap-1.5">
+            <i class="fas fa-truck text-yellow-400"></i>
+            <span>شحن مجاني للطلبات فوق {{ storeConfig.freeShippingThreshold }} {{ storeConfig.currency }}</span>
+          </div>
+          <span class="text-gray-600">|</span>
+          <a :href="'https://wa.me/' + storeConfig.whatsappNumber" target="_blank" class="flex items-center gap-1 text-emerald-400 hover:underline font-bold">
+            <i class="fab fa-whatsapp"></i>
+            <span>{{ storeConfig.whatsappNumber }}</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== رأس الموقع الرئيسي (Main Header) ==================== -->
+    <nav class="sticky top-0 z-40 main-nav transition-colors duration-300">
+      <div class="max-w-7xl mx-auto px-4 py-3">
+        <div class="flex items-center justify-between gap-4">
+          
+          <!-- الشعار (Logo) -->
+          <div class="flex items-center gap-3 cursor-pointer" @click="switchToStore">
+            <div 
+              class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md border-2 border-black/10 font-black text-2xl tracking-tighter transition-all"
+              :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+            >
+              ن
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xl md:text-2xl font-black text-prim tracking-tight">{{ storeConfig.storeName }}</span>
+                <span 
+                  class="text-[10px] font-black px-1.5 py-0.5 rounded shadow-xs"
+                  :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+                >
+                  NOON STORE
+                </span>
+              </div>
+              <p class="text-[11px] text-mut hidden sm:block">كل الملابس والإلكترونيات بأسعار نون</p>
+            </div>
+          </div>
+
+          <!-- موقع التوصيل السريع -->
+          <div class="hidden lg:flex items-center gap-2 tag-bg border border-col px-3 py-1.5 rounded-lg text-xs">
+            <i class="fas fa-map-marker-alt text-amber-500 text-sm"></i>
+            <div>
+              <span class="text-mut block text-[10px]">التوصيل إلى</span>
+              <strong class="text-prim">القاهرة والجيزة وكافة المحافظات</strong>
+            </div>
+          </div>
+
+          <!-- مربع البحث الذكي -->
+          <div v-if="currentView === 'store'" class="flex-1 max-w-xl relative">
+            <div class="relative">
+              <input 
+                type="text" 
+                v-model="searchQuery" 
+                placeholder="ابحث عن الملابس أو الماركات أو الموديلات... (تي شيرت، فستان، جينز، ليفايس، زارا...)"
+                class="w-full themed-input text-sm pr-10 pl-10 py-2.5 rounded-full placeholder-gray-400 font-medium"
+              >
+              <i class="fas fa-search absolute right-3.5 top-3.5 text-mut"></i>
+              <button 
+                v-if="searchQuery" 
+                @click="searchQuery = ''"
+                class="absolute left-3.5 top-3 text-mut hover:text-prim"
+              >
+                <i class="fas fa-times-circle"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- أزرار التحكم: دارك مود + سلة + أدمن + واتساب -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            
+            <!-- زر تبديل الدارك مود (Dark Mode Switch) -->
+            <button 
+              @click="toggleDarkMode"
+              class="flex items-center justify-center w-9 h-9 rounded-xl tag-bg border border-col text-prim hover:scale-105 transition shadow-xs"
+              :title="isDarkMode ? 'التحويل للوضع النهاري' : 'التحويل للوضع الليلي'"
+            >
+              <i v-if="isDarkMode" class="fas fa-sun text-amber-400 text-sm"></i>
+              <i v-else class="fas fa-moon text-indigo-500 text-sm"></i>
+            </button>
+
+            <!-- زر لوحة التحكم (Admin Panel Switch) -->
+            <button 
+              v-if="currentView === 'store'"
+              @click="switchToAdmin" 
+              class="flex items-center gap-1.5 bg-gray-900 hover:bg-black text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm"
+              title="لوحة تحكم وتعديل الأسعار والمنتجات والألوان"
+            >
+              <i class="fas fa-palette text-amber-300"></i>
+              <span class="hidden md:inline">الأدمن والمظهر</span>
+            </button>
+
+            <!-- زر العودة للمتجر إذا كان في لوحة التحكم -->
+            <button 
+              v-else 
+              @click="switchToStore" 
+              class="btn-primary flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition shadow-sm"
+            >
+              <i class="fas fa-store"></i>
+              <span>العودة للمتجر</span>
+            </button>
+
+            <!-- زر التواصل عبر واتساب السريع -->
+            <button 
+              @click="openGeneralWhatsApp"
+              class="btn-whatsapp flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm"
+              title="تواصل معنا عبر واتساب"
+            >
+              <i class="fab fa-whatsapp text-sm"></i>
+              <span class="hidden sm:inline">واتساب</span>
+            </button>
+
+            <!-- زر سلة المشتريات (Cart Drawer Trigger) -->
+            <button 
+              @click="isCartOpen = true"
+              class="relative flex items-center gap-2 tag-bg border border-col text-prim hover:border-amber-400 px-3.5 py-2 rounded-xl text-xs font-bold transition"
+            >
+              <div class="relative">
+                <i class="fas fa-shopping-cart text-base"></i>
+                <span 
+                  v-if="cartCount > 0"
+                  class="absolute -top-2 -right-2 bg-red-600 text-white font-extrabold text-[10px] w-5 h-5 rounded-full flex items-center justify-center animate-bounce shadow"
+                >
+                  {{ cartCount }}
+                </span>
+              </div>
+              <span class="hidden md:inline font-bold">السلة</span>
+              <span v-if="cartSubtotal > 0" class="hidden lg:inline text-prim font-extrabold mr-1">
+                {{ cartSubtotal.toLocaleString() }} {{ storeConfig.currency }}
+              </span>
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- شريط تصنيفات نون الكامل مع ملابس رجالي، حريمي، أطفال، رياضة -->
+      <div v-if="currentView === 'store'" class="nav-bg border-t border-col px-4">
+        <div class="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto category-scroll-container py-2.5 text-xs font-bold">
+          <button 
+            v-for="cat in categories" 
+            :key="cat.id"
+            @click="selectedCategory = cat.id"
+            :class="[
+              'px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 font-bold',
+              selectedCategory === cat.id ? 'cat-pill-active shadow-sm' : 'cat-pill'
+            ]"
+          >
+            <i :class="cat.icon"></i>
+            <span>{{ cat.name }}</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ========================================================================= -->
+    <!--                               واجهة المتجر الرئيسي                        -->
+    <!-- ========================================================================= -->
+    <main v-if="currentView === 'store'" class="max-w-7xl mx-auto px-4 py-5">
+      
+      <!-- البانر الإعلاني الكبير والديناميكي (يدعم إضافة إعلانات وبانرات من الأدمن) -->
+      <section v-if="currentBanner" class="hero-banner rounded-2xl p-6 md:p-10 mb-8 text-white relative shadow-lg overflow-hidden">
+        <div class="relative z-10 max-w-2xl">
+          <div 
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black mb-3 shadow-xs"
+            :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+          >
+            <i class="fas fa-bullhorn text-red-600"></i>
+            <span>{{ currentBanner.badge || 'إعلان وعرض خاص ⚡' }}</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl md:text-5xl font-black mb-3 leading-tight">
+            {{ currentBanner.title }}
+          </h1>
+          <p class="text-gray-300 text-sm sm:text-base mb-6 leading-relaxed">
+            {{ currentBanner.description }}
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button 
+              @click="selectedCategory = currentBanner.linkCategory || 'all'" 
+              class="btn-primary px-6 py-3 rounded-xl font-black text-sm flex items-center gap-2 shadow-lg"
+            >
+              <i class="fas fa-shopping-bag"></i>
+              <span>{{ currentBanner.buttonText || 'تسوق العرض الآن' }}</span>
+            </button>
+            <button 
+              @click="selectedCategory = 'makeup'" 
+              class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg"
+            >
+              <i class="fas fa-magic"></i>
+              <span>قسم الميكب والتجميل</span>
+            </button>
+            <button 
+              @click="selectedCategory = 'clothing-women'" 
+              class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 backdrop-blur-sm"
+            >
+              <i class="fas fa-female"></i>
+              <span>ملابس حريمي</span>
+            </button>
+            <a 
+              :href="'https://wa.me/' + storeConfig.whatsappNumber + '?text=' + encodeURIComponent('مرحباً متجر أبو السعود، أود الاستفسار عن الإعلان: ' + currentBanner.title)" 
+              target="_blank"
+              class="btn-whatsapp px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2"
+            >
+              <i class="fab fa-whatsapp text-lg"></i>
+              <span>طلب مباشر بواتساب</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- صورة البانر الخلفية إن وجدت -->
+        <div v-if="currentBanner.image" class="hidden md:block absolute left-0 top-0 bottom-0 w-2/5 overflow-hidden pointer-events-none opacity-40 lg:opacity-60">
+          <img :src="currentBanner.image" class="w-full h-full object-cover object-center mask-radial">
+        </div>
+
+        <!-- أزرار التنقل بين الإعلانات إذا كان هناك أكثر من إعلان -->
+        <div v-if="activeBanners.length > 1" class="absolute bottom-4 left-6 flex items-center gap-2 z-20">
+          <button 
+            @click="prevBanner" 
+            class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center text-xs backdrop-blur-sm transition"
+            title="الإعلان السابق"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <span class="text-xs font-bold text-gray-300">
+            {{ (activeBannerIndex % activeBanners.length) + 1 }} / {{ activeBanners.length }}
+          </span>
+          <button 
+            @click="nextBanner" 
+            class="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center text-xs backdrop-blur-sm transition"
+            title="الإعلان التالي"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- شريط الميزات والضمانات -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <div class="card-bg p-3.5 rounded-xl border border-col flex items-center gap-3 shadow-xs">
+          <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-xs text-prim">ملابس أصلية 100%</h4>
+            <p class="text-[11px] text-mut">خامات قطنية عالمية وماركات</p>
+          </div>
+        </div>
+
+        <div class="card-bg p-3.5 rounded-xl border border-col flex items-center gap-3 shadow-xs">
+          <div class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fas fa-truck-fast"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-xs text-prim">توصيل نون إكسبريس</h4>
+            <p class="text-[11px] text-mut">شحن سريع لكافة المحافظات</p>
+          </div>
+        </div>
+
+        <div class="card-bg p-3.5 rounded-xl border border-col flex items-center gap-3 shadow-xs">
+          <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-xs text-prim">طلب سريع بواتساب</h4>
+            <p class="text-[11px] text-mut">{{ storeConfig.whatsappNumber }}</p>
+          </div>
+        </div>
+
+        <div class="card-bg p-3.5 rounded-xl border border-col flex items-center gap-3 shadow-xs">
+          <div class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fas fa-ruler-combined"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-xs text-prim">كافة المقاسات متاحة</h4>
+            <p class="text-[11px] text-mut">من S حتى 4XL للأطفال والكبار</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- قسم عروض الصفقات السريعة -->
+      <section v-if="flashDealProducts.length > 0 && selectedCategory === 'all' && !searchQuery" class="mb-10 card-bg p-4 sm:p-6 rounded-2xl border border-col shadow-sm">
+        <div class="flex items-center justify-between mb-4 border-b border-col pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-600 rounded-full animate-ping"></span>
+            <h2 class="text-base sm:text-lg font-black text-prim flex items-center gap-2">
+              <i class="fas fa-fire text-red-500"></i>
+              <span>صفقات نون الخاطفة وتخفيضات الملابس</span>
+            </h2>
+          </div>
+          <span class="text-xs text-mut font-bold">خصومات تصل إلى 70%</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div 
+            v-for="product in flashDealProducts.slice(0, 4)" 
+            :key="'deal-' + product.id"
+            class="product-card"
+          >
+            <div class="card-img-wrapper h-44 cursor-pointer" @click="openProductDetails(product)">
+              <img :src="product.image" :alt="product.name" class="product-img">
+              <span v-if="calculateDiscount(product.price, product.oldPrice)" class="discount-tag absolute top-2 right-2">
+                خصم {{ calculateDiscount(product.price, product.oldPrice) }}%
+              </span>
+              <span v-if="product.isExpress" class="noon-express-badge absolute bottom-2 right-2">
+                <i class="fas fa-bolt"></i> إكسبريس
+              </span>
+            </div>
+
+            <div class="p-3 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-[11px] text-mut mb-1 font-medium">{{ product.categoryName }}</p>
+                <h3 
+                  @click="openProductDetails(product)"
+                  class="font-bold text-xs sm:text-sm text-prim line-clamp-2 hover:text-blue-500 cursor-pointer mb-2 leading-snug"
+                >
+                  {{ product.name }}
+                </h3>
+              </div>
+
+              <div>
+                <div class="flex items-baseline gap-2 mb-2">
+                  <span class="text-base font-black text-prim">
+                    {{ product.price.toLocaleString() }}
+                  </span>
+                  <span class="text-xs font-bold text-mut">{{ storeConfig.currency }}</span>
+                  <span v-if="product.oldPrice" class="text-[11px] text-mut line-through">
+                    {{ product.oldPrice.toLocaleString() }}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-col">
+                  <button 
+                    @click="addToCart(product)"
+                    class="btn-primary text-[11px] py-1.5 rounded-lg flex items-center justify-center gap-1 font-bold"
+                  >
+                    <i class="fas fa-plus"></i> للسلة
+                  </button>
+                  <button 
+                    @click="orderProductViaWhatsApp(product)"
+                    class="btn-whatsapp text-[11px] py-1.5 rounded-lg flex items-center justify-center gap-1 font-bold"
+                  >
+                    <i class="fab fa-whatsapp"></i> واتساب
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- شريط الفلاتر والترتيب -->
+      <div class="card-bg p-4 rounded-xl border border-col mb-6 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs font-extrabold text-prim">
+            المنتجات المعروضة ({{ filteredProducts.length }})
+          </span>
+
+          <!-- فلتر إكسبريس -->
+          <label class="cursor-pointer flex items-center gap-1.5 tag-bg border border-col px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            <input type="checkbox" v-model="filterOnlyExpress" class="accent-amber-500 rounded">
+            <span class="noon-express-badge text-[10px]">
+              <i class="fas fa-bolt"></i> نون إكسبريس
+            </span>
+          </label>
+
+          <!-- فلتر العروض والتخفيضات -->
+          <label class="cursor-pointer flex items-center gap-1.5 tag-bg border border-col px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            <input type="checkbox" v-model="filterOnlyDeals" class="accent-amber-500 rounded">
+            <span class="text-red-500 flex items-center gap-1">
+              <i class="fas fa-fire"></i> التخفيضات فقط
+            </span>
+          </label>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-mut font-medium">ترتيب حسب:</span>
+          <select 
+            v-model="sortBy"
+            class="themed-input font-bold rounded-lg px-3 py-1.5 text-xs"
+          >
+            <option value="featured">المميزة والموصى بها</option>
+            <option value="price-low">السعر: من الأقل للأعلى</option>
+            <option value="price-high">السعر: من الأعلى للأقل</option>
+            <option value="discount">الأعلى في نسبة الخصم</option>
+            <option value="rating">الأعلى تقييماً</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- شبكة المنتجات الرئيسية -->
+      <section v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div 
+          v-for="product in filteredProducts" 
+          :key="product.id"
+          class="product-card"
+        >
+          <!-- صورة المنتج وشارات نون -->
+          <div class="card-img-wrapper h-60 cursor-pointer" @click="openProductDetails(product)">
+            <img :src="product.image" :alt="product.name" class="product-img">
+            
+            <!-- شارة الخصم -->
+            <span 
+              v-if="calculateDiscount(product.price, product.oldPrice)" 
+              class="discount-tag absolute top-2.5 right-2.5 shadow-sm"
+            >
+              خصم {{ calculateDiscount(product.price, product.oldPrice) }}%
+            </span>
+
+            <!-- شارة الفئة أو المميز -->
+            <span 
+              v-if="product.badge" 
+              :class="['absolute top-2.5 left-2.5 font-bold text-[10px] px-2 py-0.5 rounded shadow-sm', badgeClass(product.badge)]"
+            >
+              {{ badgeLabel(product.badge) }}
+            </span>
+
+            <!-- شارة إكسبريس -->
+            <span v-if="product.isExpress" class="noon-express-badge absolute bottom-2.5 right-2.5">
+              <i class="fas fa-bolt"></i> إكسبريس
+            </span>
+          </div>
+
+          <!-- تفاصيل المنتج -->
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-[11px] text-mut mb-1">
+                <span>{{ product.categoryName }}</span>
+                <!-- التقييم -->
+                <div class="flex items-center gap-1 text-amber-500 font-bold tag-bg px-1.5 py-0.5 rounded">
+                  <span>{{ product.rating || 4.8 }}</span>
+                  <i class="fas fa-star text-[10px]"></i>
+                  <span class="text-mut text-[10px]">({{ product.reviewsCount || 40 }})</span>
+                </div>
+              </div>
+
+              <h3 
+                @click="openProductDetails(product)"
+                class="font-bold text-sm text-prim line-clamp-2 hover:text-blue-500 cursor-pointer mb-2 leading-relaxed"
+              >
+                {{ product.name }}
+              </h3>
+
+              <!-- المقاسات المتوفرة إن وجدت (للملابس) -->
+              <div v-if="product.sizes && product.sizes.length" class="flex flex-wrap items-center gap-1 my-2">
+                <span class="text-[10px] text-mut">المقاسات:</span>
+                <span 
+                  v-for="s in product.sizes.slice(0, 5)" 
+                  :key="s" 
+                  class="size-chip text-[10px]"
+                >
+                  {{ s }}
+                </span>
+                <span v-if="product.sizes.length > 5" class="text-[10px] text-mut">+{{ product.sizes.length - 5 }}</span>
+              </div>
+
+              <p class="text-mut text-xs line-clamp-2 mb-3">
+                {{ product.description }}
+              </p>
+            </div>
+
+            <div>
+              <!-- الأسعار بأسلوب نون مصر -->
+              <div class="mb-3">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-xl font-black text-prim">
+                    {{ product.price.toLocaleString() }}
+                  </span>
+                  <span class="text-xs font-bold text-mut">{{ storeConfig.currency }}</span>
+                  
+                  <span v-if="product.oldPrice && product.oldPrice > product.price" class="text-xs text-mut line-through">
+                    {{ product.oldPrice.toLocaleString() }} {{ storeConfig.currency }}
+                  </span>
+                </div>
+                
+                <span v-if="product.oldPrice && product.oldPrice > product.price" class="text-[11px] text-emerald-600 font-bold block mt-0.5">
+                  وفر {{ (product.oldPrice - product.price).toLocaleString() }} {{ storeConfig.currency }}
+                </span>
+              </div>
+
+              <!-- أزرار الإجراءات السريعة: سلة نون + طلب واتساب المباشر -->
+              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-col">
+                <button 
+                  @click="addToCart(product)"
+                  class="btn-primary py-2 px-2 rounded-lg text-xs font-black flex items-center justify-center gap-1.5"
+                  title="أضف إلى سلة المشتريات"
+                >
+                  <i class="fas fa-cart-plus"></i>
+                  <span>أضف للسلة</span>
+                </button>
+
+                <button 
+                  @click="orderProductViaWhatsApp(product)"
+                  class="btn-whatsapp py-2 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5"
+                  title="اطلب مباشرة وتحدث معنا عبر واتساب"
+                >
+                  <i class="fab fa-whatsapp text-sm"></i>
+                  <span>شراء بواتساب</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- حالة عدم وجود منتجات مطابقة للبحث -->
+      <div v-else class="card-bg rounded-2xl border border-col p-12 text-center my-8">
+        <div class="w-16 h-16 tag-bg text-mut rounded-full flex items-center justify-center mx-auto text-2xl mb-4">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3 class="text-lg font-bold text-prim mb-1">لم نجد أي منتجات تطابق بحثك!</h3>
+        <p class="text-mut text-sm mb-4">جرب البحث بكلمات أخرى أو قم بإلغاء الفلاتر المحددة</p>
+        <button 
+          @click="searchQuery = ''; selectedCategory = 'all'; filterOnlyExpress = false; filterOnlyDeals = false;"
+          class="btn-primary font-black text-xs px-5 py-2.5 rounded-lg"
+        >
+          عرض جميع المنتجات
+        </button>
+      </div>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!--                   لوحة التحكم وإدارة المنتجات (Admin View)                -->
+    <!-- ========================================================================= -->
+    <main v-else class="max-w-7xl mx-auto px-4 py-6">
+      
+      <!-- نافذة تسجيل الدخول للوحة التحكم إذا لم يكن مسجلاً -->
+      <div v-if="!isAdminAuthenticated" class="max-w-md mx-auto my-12 card-bg rounded-2xl shadow-xl border border-col p-8 text-center">
+        <div 
+          class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-md"
+          :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+        >
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h2 class="text-2xl font-black text-prim mb-1">لوحة إدارة متجر أبو السعود</h2>
+        <p class="text-mut text-xs mb-6">أدخل رمز المرور السري للتحكم بالمنتجات والأسعار والمظهر والدارك مود</p>
+
+        <form @submit.prevent="loginAdmin" class="space-y-4">
+          <div>
+            <input 
+              type="password" 
+              v-model="adminPinInput" 
+              placeholder="رمز المرور السري" 
+              class="w-full text-center text-lg tracking-widest px-4 py-3 themed-input rounded-xl font-bold"
+              autofocus
+            >
+            <p v-if="adminLoginError" class="text-red-500 text-xs mt-1.5 font-bold">{{ adminLoginError }}</p>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full btn-primary py-3 rounded-xl font-black text-sm shadow-md"
+          >
+            دخول لوحة التحكم
+          </button>
+          
+          <button 
+            type="button" 
+            @click="switchToStore" 
+            class="w-full tag-bg text-prim hover:bg-gray-200 py-2.5 rounded-xl text-xs font-bold"
+          >
+            الرجوع للمتجر
+          </button>
+        </form>
+      </div>
+
+      <!-- لوحة التحكم الكاملة عند تسجيل الدخول -->
+      <div v-else>
+        
+        <!-- الشريط العلوي للوحة الأدمن -->
+        <div class="card-bg p-5 rounded-2xl border border-col shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h1 class="text-xl font-black text-prim">لوحة تحكم وإدارة المتجر</h1>
+              <span 
+                class="font-black text-[10px] px-2 py-0.5 rounded"
+                :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+              >
+                أدمن متجر أبو السعود
+              </span>
+            </div>
+            <p class="text-xs text-mut mt-1">
+              تحكم كامل بالملابس والمنتجات، تعديل الأسعار، تغيير ألوان وثيم الموقع، وتبديل الدارك مود
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button 
+              @click="openAddProductModal"
+              class="btn-primary text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm"
+            >
+              <i class="fas fa-plus-circle text-sm"></i>
+              <span>إضافة منتج جديد</span>
+            </button>
+
+            <button 
+              @click="exportProductsJSON"
+              class="tag-bg hover:opacity-80 text-prim border border-col text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5"
+              title="تصدير نسخة احتياطية من كافة المنتجات والأسعار"
+            >
+              <i class="fas fa-download"></i>
+              <span class="hidden sm:inline">نسخة احتياطية</span>
+            </button>
+
+            <input type="file" id="jsonFileInput" @change="handleImportJSON" accept=".json" class="hidden">
+            <button 
+              @click="triggerImportJSON"
+              class="tag-bg hover:opacity-80 text-prim border border-col text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5"
+              title="استيراد منتجات من ملف JSON"
+            >
+              <i class="fas fa-upload"></i>
+              <span class="hidden sm:inline">استيراد</span>
+            </button>
+
+            <button 
+              @click="resetToDefaultProducts"
+              class="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5"
+              title="استعادة المنتجات والأسعار الافتراضية لنون"
+            >
+              <i class="fas fa-history"></i>
+              <span class="hidden sm:inline">إعادة ضبط</span>
+            </button>
+
+            <button 
+              @click="logoutAdmin"
+              class="bg-gray-900 hover:bg-black text-white text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5"
+            >
+              <i class="fas fa-sign-out-alt"></i>
+              <span>خروج</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- إحصائيات سريعة للوحة التحكم -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+          <div class="card-bg p-4 rounded-xl border border-col shadow-xs">
+            <div class="text-mut text-xs font-bold mb-1">إجمالي المنتجات</div>
+            <div class="text-2xl font-black text-prim">{{ adminStats.totalProducts }}</div>
+            <div class="text-[11px] text-mut mt-1">منتج متوفر بالمتجر</div>
+          </div>
+
+          <div class="card-bg p-4 rounded-xl border border-col shadow-xs">
+            <div class="text-mut text-xs font-bold mb-1">قسم الملابس</div>
+            <div class="text-2xl font-black text-indigo-500">{{ adminStats.clothingCount }}</div>
+            <div class="text-[11px] text-mut mt-1">قطعة ملابس متنوعة</div>
+          </div>
+
+          <div class="card-bg p-4 rounded-xl border border-col shadow-xs">
+            <div class="text-mut text-xs font-bold mb-1">قسم الميكب والتجميل</div>
+            <div class="text-2xl font-black text-pink-500">{{ adminStats.makeupCount }}</div>
+            <div class="text-[11px] text-mut mt-1">مستحضر ميكب أصلي</div>
+          </div>
+
+          <div class="card-bg p-4 rounded-xl border border-col shadow-xs">
+            <div class="text-mut text-xs font-bold mb-1">إجمالي القطع بالمخزون</div>
+            <div class="text-2xl font-black text-blue-500">{{ adminStats.totalStock }}</div>
+            <div class="text-[11px] text-mut mt-1">قطعة قابلة للبيع</div>
+          </div>
+
+          <div class="card-bg p-4 rounded-xl border border-col shadow-xs">
+            <div class="text-mut text-xs font-bold mb-1">قيمة المخزون الإجمالية</div>
+            <div class="text-2xl font-black text-emerald-500">
+              {{ adminStats.totalInventoryValue.toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-mut mt-1">{{ storeConfig.currency }}</div>
+          </div>
+
+          <div class="card-bg p-4 rounded-xl border border-col shadow-xs">
+            <div class="text-mut text-xs font-bold mb-1">منتجات نون إكسبريس</div>
+            <div class="text-2xl font-black text-amber-500">{{ adminStats.expressCount }}</div>
+            <div class="text-[11px] text-mut mt-1">شحن سريع فوري</div>
+          </div>
+        </div>
+
+        <!-- تبويبات لوحة التحكم -->
+        <div class="flex items-center gap-2 border-b border-col mb-6 overflow-x-auto">
+          <button 
+            @click="adminTab = 'products'"
+            :class="['px-4 py-3 font-bold text-xs border-b-2 transition whitespace-nowrap', adminTab === 'products' ? 'border-amber-400 text-prim font-black card-bg rounded-t-lg' : 'border-transparent text-mut hover:text-prim']"
+          >
+            <i class="fas fa-boxes mr-1"></i> إدارة وتعديل المنتجات والأسعار ({{ products.length }})
+          </button>
+
+          <button 
+            @click="adminTab = 'banners'"
+            :class="['px-4 py-3 font-bold text-xs border-b-2 transition whitespace-nowrap', adminTab === 'banners' ? 'border-amber-400 text-prim font-black card-bg rounded-t-lg' : 'border-transparent text-mut hover:text-prim']"
+          >
+            <i class="fas fa-bullhorn mr-1 text-red-500"></i> إدارة الإعلانات والبانرات ({{ banners.length }}) 📢
+          </button>
+
+          <button 
+            @click="adminTab = 'theme'"
+            :class="['px-4 py-3 font-bold text-xs border-b-2 transition whitespace-nowrap', adminTab === 'theme' ? 'border-amber-400 text-prim font-black card-bg rounded-t-lg' : 'border-transparent text-mut hover:text-prim']"
+          >
+            <i class="fas fa-palette mr-1"></i> تخصيص ألوان وشكل المتجر والدارك مود 🎨
+          </button>
+
+          <button 
+            @click="adminTab = 'settings'"
+            :class="['px-4 py-3 font-bold text-xs border-b-2 transition whitespace-nowrap', adminTab === 'settings' ? 'border-amber-400 text-prim font-black card-bg rounded-t-lg' : 'border-transparent text-mut hover:text-prim']"
+          >
+            <i class="fas fa-sliders mr-1"></i> إعدادات المتجر ورقم الواتساب
+          </button>
+        </div>
+
+        <!-- ================= تبويب 1: إدارة المنتجات والملابس ================= -->
+        <div v-if="adminTab === 'products'" class="card-bg rounded-2xl border border-col shadow-sm overflow-hidden">
+          
+          <!-- أدوات التصفية داخل الجدول -->
+          <div class="p-4 tag-bg border-b border-col flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-1 max-w-md">
+              <div class="relative w-full">
+                <input 
+                  type="text" 
+                  v-model="adminSearchQuery" 
+                  placeholder="ابحث بالاسم أو الكود..."
+                  class="w-full themed-input text-xs pr-8 pl-3 py-2 rounded-lg"
+                >
+                <i class="fas fa-search absolute right-2.5 top-2.5 text-mut text-xs"></i>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-mut font-bold">القسم:</span>
+              <select 
+                v-model="adminCategoryFilter" 
+                class="themed-input text-xs font-bold rounded-lg px-2.5 py-1.5"
+              >
+                <option value="all">كل الأقسام</option>
+                <option v-for="cat in categories.slice(1)" :key="cat.id" :value="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- جدول المنتجات وتعديل الأسعار -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-right admin-table text-xs">
+              <thead>
+                <tr class="border-b border-col">
+                  <th class="p-3">المنتج</th>
+                  <th class="p-3">القسم</th>
+                  <th class="p-3">السعر الحالي (ج.م)</th>
+                  <th class="p-3">السعر القديم (ج.م)</th>
+                  <th class="p-3">المخزون</th>
+                  <th class="p-3">إكسبريس</th>
+                  <th class="p-3 text-center">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tr v-for="product in filteredAdminProducts" :key="'admin-' + product.id">
+                  
+                  <!-- تفاصيل المنتج والصورة -->
+                  <td class="p-3">
+                    <div class="flex items-center gap-3">
+                      <img :src="product.image" class="w-12 h-12 rounded-lg object-cover border border-col flex-shrink-0">
+                      <div>
+                        <div class="font-bold text-prim line-clamp-1 text-xs" :title="product.name">
+                          {{ product.name }}
+                        </div>
+                        <span class="text-[10px] text-mut font-mono">#{{ product.id }}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- القسم -->
+                  <td class="p-3 whitespace-nowrap text-sec font-medium">
+                    {{ product.categoryName }}
+                  </td>
+
+                  <!-- السعر الحالي مع إمكانية التعديل السريع المباشر -->
+                  <td class="p-3 whitespace-nowrap">
+                    <div class="flex items-center gap-1">
+                      <input 
+                        type="number" 
+                        :value="product.price" 
+                        @change="quickUpdatePrice(product, $event.target.value)"
+                        class="w-24 px-2 py-1 themed-input rounded text-xs font-black text-prim focus:bg-white focus:outline-none"
+                      >
+                      <span class="text-[11px] font-bold text-mut">ج.م</span>
+                    </div>
+                  </td>
+
+                  <!-- السعر القديم (قبل الخصم) -->
+                  <td class="p-3 whitespace-nowrap">
+                    <span class="text-mut line-through">
+                      {{ product.oldPrice ? product.oldPrice.toLocaleString() + ' ج.م' : '-' }}
+                    </span>
+                  </td>
+
+                  <!-- المخزون -->
+                  <td class="p-3 whitespace-nowrap">
+                    <span :class="['px-2 py-0.5 rounded text-[11px] font-bold', product.stock > 5 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500']">
+                      {{ product.stock }} قطعة
+                    </span>
+                  </td>
+
+                  <!-- إكسبريس -->
+                  <td class="p-3 whitespace-nowrap">
+                    <span v-if="product.isExpress" class="noon-express-badge text-[10px]">
+                      <i class="fas fa-bolt"></i> إكسبريس
+                    </span>
+                    <span v-else class="text-mut text-[11px]">عادي</span>
+                  </td>
+
+                  <!-- الإجراءات -->
+                  <td class="p-3 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center gap-1.5">
+                      <button 
+                        @click="openEditProductModal(product)"
+                        class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 p-2 rounded-lg text-xs"
+                        title="تعديل كامل لبيانات المنتج"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+
+                      <button 
+                        @click="orderProductViaWhatsApp(product)"
+                        class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 p-2 rounded-lg text-xs"
+                        title="تجربة رابط الواتساب لهذا المنتج"
+                      >
+                        <i class="fab fa-whatsapp"></i>
+                      </button>
+
+                      <button 
+                        @click="deleteProduct(product)"
+                        class="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-lg text-xs"
+                        title="حذف المنتج نهائياً"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ================= تبويب إدارة الإعلانات والبانرات الترويجية ================= -->
+        <div v-if="adminTab === 'banners'" class="card-bg rounded-2xl border border-col shadow-sm p-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 border-b border-col pb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-bullhorn text-red-500 text-lg"></i>
+                <h2 class="text-lg font-black text-prim">إدارة الإعلانات والبانرات الترويجية</h2>
+              </div>
+              <p class="text-xs text-mut mt-1">
+                أنشئ إعلانات جديدة تظهر في أعلى الصفحة لترويج العروض والمنتجات والتخفيضات الكبرى
+              </p>
+            </div>
+
+            <button 
+              @click="openAddBannerModal"
+              class="btn-primary text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm"
+            >
+              <i class="fas fa-plus-circle text-sm"></i>
+              <span>إضافة إعلان جديد 📢</span>
+            </button>
+          </div>
+
+          <!-- قائمة الإعلانات المضافة -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div 
+              v-for="b in banners" 
+              :key="b.id"
+              class="p-4 rounded-xl border border-col tag-bg flex flex-col justify-between transition hover:shadow-md"
+            >
+              <div>
+                <div class="relative h-40 rounded-xl overflow-hidden mb-3 border border-col bg-gray-900">
+                  <img :src="b.image" class="w-full h-full object-cover">
+                  <span 
+                    class="absolute top-2.5 right-2.5 text-[10px] font-black px-2 py-0.5 rounded shadow"
+                    :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+                  >
+                    {{ b.badge || 'إعلان' }}
+                  </span>
+                  <span 
+                    :class="['absolute bottom-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded shadow', b.active ? 'bg-emerald-600 text-white' : 'bg-gray-600 text-white']"
+                  >
+                    {{ b.active ? 'مفعل ويعمل حالياً' : 'معطل مؤقتاً' }}
+                  </span>
+                </div>
+
+                <h3 class="font-black text-sm text-prim mb-1">{{ b.title }}</h3>
+                <p class="text-xs text-mut line-clamp-2 mb-3">{{ b.description }}</p>
+
+                <div class="flex items-center gap-2 text-xs text-mut mb-2 font-medium">
+                  <i class="fas fa-tag text-amber-500"></i>
+                  <span>القسم الموجه إليه: <strong>{{ b.linkCategory || 'الكل' }}</strong></span>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-col flex items-center justify-between gap-2 mt-2">
+                <button 
+                  @click="toggleBannerStatus(b)"
+                  :class="['text-xs font-bold px-3 py-1.5 rounded-lg border transition', b.active ? 'border-amber-400 text-amber-500 hover:bg-amber-400/10' : 'border-emerald-500 text-emerald-500 hover:bg-emerald-500/10']"
+                >
+                  <i :class="b.active ? 'fas fa-pause mr-1' : 'fas fa-play mr-1'"></i>
+                  <span>{{ b.active ? 'إيقاف مؤقت' : 'تفعيل الإعلان' }}</span>
+                </button>
+
+                <div class="flex items-center gap-1.5">
+                  <button 
+                    @click="openEditBannerModal(b)"
+                    class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 p-2 rounded-lg text-xs"
+                    title="تعديل الإعلان"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+
+                  <button 
+                    @click="deleteBanner(b)"
+                    class="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-2 rounded-lg text-xs"
+                    title="حذف الإعلان"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= تبويب 2: تخصيص الألوان والمظهر والدارك مود ================= -->
+        <div v-if="adminTab === 'theme'" class="card-bg rounded-2xl border border-col shadow-sm p-6 max-w-3xl">
+          <div class="flex items-center justify-between mb-4 border-b border-col pb-3">
+            <div>
+              <h2 class="text-lg font-black text-prim">تخصيص ألوان وشكل المتجر</h2>
+              <p class="text-xs text-mut mt-0.5">تحكم في اللون الأساسي، الوضع الليلي (Dark Mode)، وشكل الكروت والأزرار</p>
+            </div>
+            <!-- زر تبديل الدارك مود السريع -->
+            <button 
+              @click="toggleDarkMode"
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black tag-bg border border-col hover:scale-105 transition"
+            >
+              <i :class="isDarkMode ? 'fas fa-sun text-amber-400' : 'fas fa-moon text-indigo-500'"></i>
+              <span>{{ isDarkMode ? 'تفعيل الوضع النهاري' : 'تفعيل الوضع الليلي (Dark Mode)' }}</span>
+            </button>
+          </div>
+
+          <div class="space-y-6">
+            
+            <!-- ألوان جاهزة بريسيتس (Color Presets) -->
+            <div>
+              <label class="block text-xs font-bold text-prim mb-2">اختر من لوحات الألوان الجاهزة للمتجر:</label>
+              <div class="flex flex-wrap gap-3">
+                <button 
+                  v-for="preset in presetColors" 
+                  :key="preset.label"
+                  @click="applyPresetColor(preset)"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition hover:scale-105"
+                  :class="storeConfig.primaryColor === preset.primary ? 'border-col ring-2 ring-amber-400 font-black' : 'border-col tag-bg'"
+                >
+                  <span class="w-4 h-4 rounded-full border border-black/20" :style="{ backgroundColor: preset.primary }"></span>
+                  <span class="text-prim">{{ preset.label }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- لون مخصص Color Picker -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-col">
+              <div>
+                <label class="block text-xs font-bold text-prim mb-1.5">اللون الأساسي المخصص (Primary Color):</label>
+                <div class="flex items-center gap-3">
+                  <input 
+                    type="color" 
+                    v-model="storeConfig.primaryColor"
+                    @change="applyTheme"
+                    class="w-12 h-10 rounded-lg cursor-pointer border border-col bg-transparent"
+                  >
+                  <input 
+                    type="text" 
+                    v-model="storeConfig.primaryColor" 
+                    @change="applyTheme"
+                    class="themed-input px-3 py-2 text-xs font-mono font-bold flex-1"
+                  >
+                </div>
+                <p class="text-[11px] text-mut mt-1">يُطبّق على الأزرار والشعار وشريط التصنيفات النشط والبادجات.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-prim mb-1.5">لون نص الأزرار الأساسية:</label>
+                <div class="flex items-center gap-3">
+                  <input 
+                    type="color" 
+                    v-model="storeConfig.primaryTextColor"
+                    @change="applyTheme"
+                    class="w-12 h-10 rounded-lg cursor-pointer border border-col bg-transparent"
+                  >
+                  <input 
+                    type="text" 
+                    v-model="storeConfig.primaryTextColor" 
+                    @change="applyTheme"
+                    class="themed-input px-3 py-2 text-xs font-mono font-bold flex-1"
+                  >
+                </div>
+                <p class="text-[11px] text-mut mt-1">يُفضل الأسود #1a1a1a مع الأصفر، والأبيض #ffffff مع الألوان الداكنة.</p>
+              </div>
+            </div>
+
+            <!-- لون زر الواتساب والتواصل -->
+            <div class="pt-4 border-t border-col">
+              <label class="block text-xs font-bold text-prim mb-1.5">لون أزرار الواتساب (Accent / WhatsApp Color):</label>
+              <div class="flex items-center gap-3 max-w-sm">
+                <input 
+                  type="color" 
+                  v-model="storeConfig.accentColor"
+                  @change="applyTheme"
+                  class="w-12 h-10 rounded-lg cursor-pointer border border-col bg-transparent"
+                >
+                <input 
+                  type="text" 
+                  v-model="storeConfig.accentColor" 
+                  @change="applyTheme"
+                  class="themed-input px-3 py-2 text-xs font-mono font-bold flex-1"
+                >
+              </div>
+            </div>
+
+            <!-- شكل حواف الكروت والأزرار (Border Radius) -->
+            <div class="pt-4 border-t border-col">
+              <label class="block text-xs font-bold text-prim mb-2">
+                انحناء حواف كروت المنتجات والأزرار: ({{ storeConfig.borderRadius || '16' }}px)
+              </label>
+              <div class="flex items-center gap-4 max-w-md">
+                <span class="text-xs text-mut font-bold">مستطيل (4px)</span>
+                <input 
+                  type="range" 
+                  min="4" 
+                  max="28" 
+                  step="2" 
+                  v-model="storeConfig.borderRadius" 
+                  @input="applyTheme"
+                  class="flex-1 accent-amber-400"
+                >
+                <span class="text-xs text-mut font-bold">دائري جداً (28px)</span>
+              </div>
+            </div>
+
+            <!-- معاينة حية Live Preview -->
+            <div class="pt-4 border-t border-col">
+              <label class="block text-xs font-bold text-prim mb-2">معاينة مباشرة لشكل الأزرار والبادجات:</label>
+              <div class="p-4 rounded-xl border border-col tag-bg flex flex-wrap items-center gap-3">
+                <button class="btn-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+                  <i class="fas fa-cart-plus"></i>
+                  <span>زر الشراء الأساسي</span>
+                </button>
+                <button class="btn-whatsapp px-4 py-2 text-xs font-bold flex items-center gap-1.5">
+                  <i class="fab fa-whatsapp"></i>
+                  <span>زر الواتساب</span>
+                </button>
+                <span class="noon-express-badge text-xs">
+                  <i class="fas fa-bolt"></i> نون إكسبريس
+                </span>
+                <span class="discount-tag text-xs">خصم 25%</span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-col flex items-center justify-end gap-3">
+              <button 
+                type="button"
+                @click="updateStoreConfig" 
+                class="btn-primary px-6 py-2.5 rounded-xl font-black text-xs shadow-md"
+              >
+                <i class="fas fa-check mr-1"></i> حفظ وتطبيق المظهر
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= تبويب 3: إعدادات المتجر وبيانات الواتساب ================= -->
+        <div v-if="adminTab === 'settings'" class="card-bg rounded-2xl border border-col shadow-sm p-6 max-w-2xl">
+          <h2 class="text-lg font-black text-prim mb-1">إعدادات متجر أبو السعود</h2>
+          <p class="text-xs text-mut mb-6">قم بتعديل بيانات المتجر ورقم الواتساب المستخدم في استقبال الطلبات</p>
+
+          <form @submit.prevent="updateStoreConfig" class="space-y-4">
+            
+            <div>
+              <label class="block text-xs font-bold text-prim mb-1">اسم المتجر</label>
+              <input 
+                type="text" 
+                v-model="storeConfig.storeName" 
+                class="w-full themed-input px-3.5 py-2.5 text-xs font-bold"
+              >
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-prim mb-1">
+                رقم الواتساب لاستقبال طلبات الزبائن (المحدد من قبلك: 01093178434)
+              </label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  v-model="storeConfig.whatsappNumber" 
+                  class="w-full themed-input pr-10 pl-3.5 py-2.5 text-xs font-bold text-left font-mono"
+                  dir="ltr"
+                >
+                <i class="fab fa-whatsapp absolute right-3.5 top-3 text-emerald-500 text-base"></i>
+              </div>
+              <p class="text-[11px] text-mut mt-1">تصل إليه رسائل السلة والشراء المباشر تلقائياً وبشكل فوري.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-prim mb-1">تكلفة الشحن العادي (ج.م)</label>
+                <input 
+                  type="number" 
+                  v-model="storeConfig.shippingCost" 
+                  class="w-full themed-input px-3.5 py-2 text-xs font-bold"
+                >
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-prim mb-1">حد الشحن المجاني (ج.م)</label>
+                <input 
+                  type="number" 
+                  v-model="storeConfig.freeShippingThreshold" 
+                  class="w-full themed-input px-3.5 py-2 text-xs font-bold"
+                >
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-prim mb-1">رمز المرور الخاص بلوحة الأدمن (PIN)</label>
+              <input 
+                type="text" 
+                v-model="storeConfig.adminPin" 
+                class="w-full themed-input px-3.5 py-2.5 text-xs font-bold font-mono"
+              >
+            </div>
+
+            <div class="pt-4 border-t border-col flex items-center justify-end">
+              <button 
+                type="submit" 
+                class="btn-primary px-6 py-2.5 rounded-xl font-black text-xs shadow-md"
+              >
+                حفظ التعديلات
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ========================================================================= -->
+    <!--                     سلة المشتريات الجانبية (Cart Drawer)                 -->
+    <!-- ========================================================================= -->
+    <div 
+      v-if="isCartOpen" 
+      class="fixed inset-0 z-50 overflow-hidden"
+    >
+      <!-- خلفية معتمة -->
+      <div 
+        @click="isCartOpen = false" 
+        class="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+      ></div>
+
+      <div class="fixed inset-y-0 left-0 max-w-full flex pl-0 md:pl-10">
+        <div class="w-screen max-w-md card-bg shadow-2xl flex flex-col justify-between">
+          
+          <!-- رأس السلة -->
+          <div class="p-4 topbar-bg text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-shopping-basket text-yellow-400 text-lg"></i>
+              <h3 class="font-black text-sm">سلة المشتريات ({{ cartCount }})</h3>
+            </div>
+            <button @click="isCartOpen = false" class="text-gray-400 hover:text-white text-lg">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- شريط تقدم الشحن المجاني -->
+          <div class="p-3 tag-bg border-b border-col text-xs">
+            <div class="flex items-center justify-between font-bold mb-1.5 text-prim">
+              <span v-if="remainingForFreeShipping > 0">
+                أضف منتجات بـ <strong>{{ remainingForFreeShipping.toLocaleString() }} {{ storeConfig.currency }}</strong> للشحن المجاني! 🚚
+              </span>
+              <span v-else class="text-emerald-500 font-black">
+                🎉 مبروك! طلبك مؤهل للشحن المجاني
+              </span>
+              <span class="text-[11px]">{{ freeShippingProgress }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div 
+                class="btn-primary h-2 rounded-full transition-all duration-300" 
+                :style="{ width: freeShippingProgress + '%' }"
+              ></div>
+            </div>
+          </div>
+
+          <!-- عناصر السلة -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-3">
+            <div v-if="cart.length === 0" class="text-center py-16 text-mut">
+              <i class="fas fa-cart-arrow-down text-5xl mb-3 text-gray-300 dark:text-gray-600"></i>
+              <p class="font-bold text-sm text-prim">سلة المشتريات فارغة</p>
+              <p class="text-xs text-mut mt-1">تصفح الملابس ومنتجات نون وأضف ما يعجبك الآن!</p>
+            </div>
+
+            <div 
+              v-for="item in cart" 
+              :key="'cart-' + item.id"
+              class="flex items-center gap-3 p-3 tag-bg border border-col rounded-xl"
+            >
+              <img :src="item.image" class="w-16 h-16 rounded-lg object-cover border border-col flex-shrink-0">
+              
+              <div class="flex-1">
+                <h4 class="font-bold text-xs text-prim line-clamp-1 mb-1">{{ item.name }}</h4>
+                <div class="text-xs font-black text-prim mb-2">
+                  {{ (item.price * item.quantity).toLocaleString() }} {{ storeConfig.currency }}
+                </div>
+
+                <!-- عداد الكمية -->
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center border border-col rounded-lg card-bg overflow-hidden text-xs">
+                    <button 
+                      @click="updateQuantity(item.id, -1)" 
+                      class="px-2.5 py-1 text-prim hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >-</button>
+                    <span class="px-3 font-bold text-prim">{{ item.quantity }}</span>
+                    <button 
+                      @click="updateQuantity(item.id, 1)" 
+                      class="px-2.5 py-1 text-prim hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >+</button>
+                  </div>
+
+                  <button 
+                    @click="removeFromCart(item.id)" 
+                    class="text-red-500 hover:text-red-700 text-xs mr-auto"
+                    title="حذف"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- أسفل السلة والحساب الإجمالي -->
+          <div v-if="cart.length > 0" class="p-4 tag-bg border-t border-col space-y-3">
+            <div class="space-y-1.5 text-xs">
+              <div class="flex justify-between text-mut">
+                <span>إجمالي المنتجات:</span>
+                <span class="font-bold text-prim">{{ cartSubtotal.toLocaleString() }} {{ storeConfig.currency }}</span>
+              </div>
+              <div class="flex justify-between text-mut">
+                <span>رسوم التوصيل:</span>
+                <span v-if="shippingCost === 0" class="font-black text-emerald-500">مجاناً</span>
+                <span v-else class="font-bold text-prim">{{ shippingCost }} {{ storeConfig.currency }}</span>
+              </div>
+              <div class="flex justify-between text-base font-black text-prim pt-2 border-t border-col">
+                <span>المبلغ الكلي:</span>
+                <span class="text-lg">{{ cartTotal.toLocaleString() }} {{ storeConfig.currency }}</span>
+              </div>
+            </div>
+
+            <!-- زر إتمام الطلب عبر واتساب -->
+            <button 
+              @click="isCheckoutModalOpen = true"
+              class="w-full btn-whatsapp py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-lg"
+            >
+              <i class="fab fa-whatsapp text-lg"></i>
+              <span>إتمام الطلب عبر واتساب</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--          نافذة إتمام الطلب وإرساله إلى الواتساب (Checkout Modal)          -->
+    <!-- ========================================================================= -->
+    <div 
+      v-if="isCheckoutModalOpen" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+    >
+      <div class="card-bg rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-col relative">
+        <button 
+          @click="isCheckoutModalOpen = false" 
+          class="absolute top-4 left-4 text-mut hover:text-prim text-lg"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="text-center mb-5">
+          <div class="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <h3 class="text-lg font-black text-prim">إتمام الشراء عبر واتساب</h3>
+          <p class="text-xs text-mut">سيتم إرسال تفاصيل طلبك مباشرة للرقم المعتمد: {{ storeConfig.whatsappNumber }}</p>
+        </div>
+
+        <form @submit.prevent="checkoutViaWhatsApp" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-prim mb-1">الاسم بالكامل *</label>
+            <input 
+              type="text" 
+              v-model="customerDetails.fullName" 
+              placeholder="مثال: أحمد محمد علي" 
+              required
+              class="w-full themed-input px-3 py-2.5 font-medium"
+            >
+          </div>
+
+          <div>
+            <label class="block font-bold text-prim mb-1">رقم الهاتف والتواصل *</label>
+            <input 
+              type="tel" 
+              v-model="customerDetails.phone" 
+              placeholder="مثال: 01xxxxxxxxx" 
+              required
+              class="w-full themed-input px-3 py-2.5 font-medium"
+            >
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-prim mb-1">المحافظة</label>
+              <select 
+                v-model="customerDetails.city"
+                class="w-full themed-input px-3 py-2.5 font-medium"
+              >
+                <option value="القاهرة">القاهرة</option>
+                <option value="الجيزة">الجيزة</option>
+                <option value="الإسكندرية">الإسكندرية</option>
+                <option value="الشرقية">الشرقية</option>
+                <option value="الدقهلية">الدقهلية</option>
+                <option value="الغربية">الغربية</option>
+                <option value="القليوبية">القليوبية</option>
+                <option value="المنوفية">المنوفية</option>
+                <option value="محافظة أخرى">محافظة أخرى</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-prim mb-1">العنوان بالتفصيل *</label>
+              <input 
+                type="text" 
+                v-model="customerDetails.address" 
+                placeholder="اسم الشارع، رقم العمارة، الشقة" 
+                required
+                class="w-full themed-input px-3 py-2.5 font-medium"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-prim mb-1">ملاحظات إضافية للتوصيل (اختياري)</label>
+            <textarea 
+              v-model="customerDetails.notes" 
+              rows="2" 
+              placeholder="المقاسات المطلوبة، الألوان المفضلة، أي تفاصيل خاصة..."
+              class="w-full themed-input px-3 py-2 font-medium"
+            ></textarea>
+          </div>
+
+          <div class="p-3 tag-bg rounded-xl border border-col mt-2">
+            <div class="flex justify-between font-black text-sm text-prim">
+              <span>الإجمالي المطلوب:</span>
+              <span>{{ cartTotal.toLocaleString() }} {{ storeConfig.currency }}</span>
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full btn-whatsapp py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-lg mt-3"
+          >
+            <i class="fab fa-whatsapp text-lg"></i>
+            <span>تأكيد وإرسال الطلب للواتساب</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--            نافذة تفاصيل المنتج السريعة (Product Details Modal)           -->
+    <!-- ========================================================================= -->
+    <div 
+      v-if="activeProductModal" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+    >
+      <div class="card-bg rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-col relative max-h-[90vh] overflow-y-auto">
+        <button 
+          @click="closeProductDetails" 
+          class="absolute top-4 left-4 text-mut hover:text-prim text-xl"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="rounded-xl overflow-hidden card-img-wrapper border border-col">
+            <img :src="activeProductModal.image" :alt="activeProductModal.name" class="w-full h-72 object-cover">
+          </div>
+
+          <div class="flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs tag-bg text-sec px-2 py-0.5 rounded font-bold border border-col">
+                  {{ activeProductModal.categoryName }}
+                </span>
+                <span v-if="activeProductModal.isExpress" class="noon-express-badge text-[10px]">
+                  <i class="fas fa-bolt"></i> نون إكسبريس
+                </span>
+              </div>
+
+              <h2 class="text-base sm:text-lg font-black text-prim mb-2 leading-snug">
+                {{ activeProductModal.name }}
+              </h2>
+
+              <div class="flex items-center gap-2 text-amber-500 font-bold text-xs mb-3">
+                <span>{{ activeProductModal.rating || 4.8 }}</span>
+                <i class="fas fa-star text-xs"></i>
+                <span class="text-mut">({{ activeProductModal.reviewsCount || 50 }} تقييم مشتري)</span>
+              </div>
+
+              <!-- مقاسات المنتج إذا كان من الملابس -->
+              <div v-if="activeProductModal.sizes && activeProductModal.sizes.length" class="mb-3">
+                <label class="block text-xs font-bold text-prim mb-1.5">المقاسات المتوفرة:</label>
+                <div class="flex flex-wrap gap-1.5">
+                  <span 
+                    v-for="s in activeProductModal.sizes" 
+                    :key="s" 
+                    class="size-chip"
+                  >
+                    {{ s }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- ألوان المنتج المتوفرة -->
+              <div v-if="activeProductModal.colors && activeProductModal.colors.length" class="mb-3">
+                <label class="block text-xs font-bold text-prim mb-1.5">الألوان المتاحة:</label>
+                <div class="flex flex-wrap gap-1">
+                  <span 
+                    v-for="c in activeProductModal.colors" 
+                    :key="c" 
+                    class="text-[11px] font-bold px-2.5 py-1 rounded-lg tag-bg border border-col text-sec"
+                  >
+                    {{ c }}
+                  </span>
+                </div>
+              </div>
+
+              <p class="text-xs text-sec leading-relaxed mb-4">
+                {{ activeProductModal.description }}
+              </p>
+            </div>
+
+            <div>
+              <div class="flex items-baseline gap-2 mb-4">
+                <span class="text-2xl font-black text-prim">
+                  {{ activeProductModal.price.toLocaleString() }}
+                </span>
+                <span class="text-xs font-bold text-mut">{{ storeConfig.currency }}</span>
+                
+                <span v-if="activeProductModal.oldPrice" class="text-xs text-mut line-through">
+                  {{ activeProductModal.oldPrice.toLocaleString() }} {{ storeConfig.currency }}
+                </span>
+
+                <span v-if="calculateDiscount(activeProductModal.price, activeProductModal.oldPrice)" class="discount-tag text-[10px]">
+                  خصم {{ calculateDiscount(activeProductModal.price, activeProductModal.oldPrice) }}%
+                </span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <button 
+                  @click="addToCart(activeProductModal); closeProductDetails();"
+                  class="btn-primary py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2 shadow"
+                >
+                  <i class="fas fa-cart-plus"></i>
+                  <span>أضف للسلة</span>
+                </button>
+
+                <button 
+                  @click="orderProductViaWhatsApp(activeProductModal)"
+                  class="btn-whatsapp py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow"
+                >
+                  <i class="fab fa-whatsapp text-base"></i>
+                  <span>طلب فوري بواتساب</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--       نافذة إضافة / تعديل منتج في لوحة التحكم (Admin Product Form Modal)    -->
+    <!-- ========================================================================= -->
+    <div 
+      v-if="isProductFormModalOpen" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+    >
+      <div class="card-bg rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-col relative max-h-[90vh] overflow-y-auto">
+        <button 
+          @click="isProductFormModalOpen = false" 
+          class="absolute top-4 left-4 text-mut hover:text-prim text-lg"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <h3 class="text-lg font-black text-prim mb-1">
+          {{ isEditing ? 'تعديل بيانات وسعر المنتج' : 'إضافة منتج جديد لمتجر أبو السعود' }}
+        </h3>
+        <p class="text-xs text-mut mb-4">يمكنك تغيير السعر، الصورة، المقاسات، والوصف وأي تفاصيل ترغب بها</p>
+
+        <form @submit.prevent="saveProduct" class="space-y-3 text-xs">
+          
+          <div>
+            <label class="block font-bold text-prim mb-1">اسم المنتج باللغة العربية *</label>
+            <input 
+              type="text" 
+              v-model="productForm.name" 
+              required
+              class="w-full themed-input px-3 py-2 font-bold"
+            >
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-prim mb-1">القسم والتصنيف</label>
+              <select 
+                v-model="productForm.category" 
+                @change="onCategoryChange"
+                class="w-full themed-input px-3 py-2 font-bold"
+              >
+                <option v-for="cat in categories.slice(1)" :key="cat.id" :value="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-prim mb-1">شارة خاصة (Badge)</label>
+              <select 
+                v-model="productForm.badge" 
+                class="w-full themed-input px-3 py-2 font-medium"
+              >
+                <option value="men">رجالي</option>
+                <option value="women">حريمي</option>
+                <option value="kids">أطفال</option>
+                <option value="sport">رياضي</option>
+                <option value="newIn">وصل جديد</option>
+                <option value="sale">خصم خاص</option>
+                <option value="الأكثر مبيعاً">الأكثر مبيعاً</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block font-bold text-prim mb-1">السعر الحالي (ج.م) *</label>
+              <input 
+                type="number" 
+                v-model.number="productForm.price" 
+                required
+                class="w-full themed-input px-3 py-2 font-black text-prim"
+              >
+            </div>
+
+            <div>
+              <label class="block font-bold text-prim mb-1">السعر القديم (ج.م)</label>
+              <input 
+                type="number" 
+                v-model.number="productForm.oldPrice" 
+                placeholder="قبل الخصم"
+                class="w-full themed-input px-3 py-2 font-medium"
+              >
+            </div>
+
+            <div>
+              <label class="block font-bold text-prim mb-1">الكمية المتوفرة</label>
+              <input 
+                type="number" 
+                v-model.number="productForm.stock" 
+                class="w-full themed-input px-3 py-2 font-bold"
+              >
+            </div>
+          </div>
+
+          <!-- رفع وتحديد صورة المنتج -->
+          <div>
+            <label class="block font-bold text-prim mb-1.5">صورة المنتج *</label>
+            <div class="p-3.5 rounded-xl border border-dashed border-col tag-bg space-y-2.5">
+              
+              <!-- زر رفع الصورة من الجهاز -->
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="btn-primary px-4 py-2 rounded-xl text-xs font-black cursor-pointer inline-flex items-center gap-2 shadow hover:scale-105 transition">
+                  <i class="fas fa-camera text-sm"></i>
+                  <span>رفع صورة من جهازك / هاتفك 📷</span>
+                  <input type="file" @change="handleProductImageUpload" accept="image/*" class="hidden">
+                </label>
+                <span class="text-mut text-xs">أو ضع رابط صورة خارجي (URL)</span>
+              </div>
+
+              <!-- حقل رابط الصورة الخارجي كخيار بديل -->
+              <input 
+                type="url" 
+                v-model="productForm.image" 
+                placeholder="https://... رابط صورة خارجي"
+                class="w-full themed-input px-3 py-2 font-mono text-left text-xs"
+                dir="ltr"
+              >
+
+              <!-- معاينة الصورة المصغرة فوراً -->
+              <div v-if="productForm.image" class="flex items-center gap-3 p-2 rounded-xl card-bg border border-col">
+                <img :src="productForm.image" class="w-16 h-16 object-cover rounded-lg border border-col flex-shrink-0">
+                <div class="flex-1">
+                  <span class="text-emerald-500 font-bold text-xs block">
+                    <i class="fas fa-check-circle mr-1"></i> تم تحديد الصورة وجاهزة للعرض
+                  </span>
+                  <button 
+                    type="button" 
+                    @click="productForm.image = ''" 
+                    class="text-red-500 hover:underline text-[11px] font-bold mt-1 inline-flex items-center gap-1"
+                  >
+                    <i class="fas fa-trash-alt"></i> إزالة الصورة
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-prim mb-1">وصف المنتج ومميزاته</label>
+            <textarea 
+              v-model="productForm.description" 
+              rows="3" 
+              class="w-full themed-input px-3 py-2 font-medium"
+            ></textarea>
+          </div>
+
+          <div class="flex items-center gap-6 py-1">
+            <label class="flex items-center gap-2 cursor-pointer font-bold text-prim">
+              <input type="checkbox" v-model="productForm.isExpress" class="accent-amber-500">
+              <span>نون إكسبريس (شحن سريع)</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer font-bold text-prim">
+              <input type="checkbox" v-model="productForm.isDeal" class="accent-amber-500">
+              <span>عرض ترويجي مميز</span>
+            </label>
+          </div>
+
+          <div class="pt-3 border-t border-col flex items-center justify-end gap-2">
+            <button 
+              type="button" 
+              @click="isProductFormModalOpen = false" 
+              class="tag-bg hover:opacity-80 text-prim px-4 py-2 rounded-xl font-bold"
+            >
+              إلغاء
+            </button>
+            <button 
+              type="submit" 
+              class="btn-primary px-6 py-2 rounded-xl font-black shadow-md"
+            >
+              {{ isEditing ? 'حفظ التعديلات' : 'إضافة المنتج' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--       نافذة إضافة / تعديل إعلان وبانر ترويجي (Admin Banner Form Modal)      -->
+    <!-- ========================================================================= -->
+    <div 
+      v-if="isBannerModalOpen" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+    >
+      <div class="card-bg rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-col relative max-h-[90vh] overflow-y-auto">
+        <button 
+          @click="isBannerModalOpen = false" 
+          class="absolute top-4 left-4 text-mut hover:text-prim text-lg"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+
+        <div class="flex items-center gap-2 mb-1">
+          <i class="fas fa-bullhorn text-red-500 text-lg"></i>
+          <h3 class="text-lg font-black text-prim">
+            {{ isBannerEditing ? 'تعديل الإعلان والبانر' : 'إنشاء ونشر إعلان ترويجي جديد' }}
+          </h3>
+        </div>
+        <p class="text-xs text-mut mb-4">يظهر هذا الإعلان في أعلى الصفحة الرئيسية لجميع زوار المتجر مع رابط مباشر للواتساب أو القسم المطلوب</p>
+
+        <form @submit.prevent="saveBanner" class="space-y-3.5 text-xs">
+          
+          <div>
+            <label class="block font-bold text-prim mb-1">عنوان الإعلان الرئيسي *</label>
+            <input 
+              type="text" 
+              v-model="bannerForm.title" 
+              placeholder="مثال: خصم 50% على تشكيلة الملابس الشتوية والميكب!" 
+              required
+              class="w-full themed-input px-3.5 py-2.5 font-black text-prim"
+            >
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-prim mb-1">شارة الإعلان (Badge)</label>
+              <input 
+                type="text" 
+                v-model="bannerForm.badge" 
+                placeholder="مثال: عرض اليوم فقط ⚡" 
+                class="w-full themed-input px-3 py-2 font-bold"
+              >
+            </div>
+
+            <div>
+              <label class="block font-bold text-prim mb-1">القسم الموجه إليه العرض</label>
+              <select 
+                v-model="bannerForm.linkCategory" 
+                class="w-full themed-input px-3 py-2 font-bold"
+              >
+                <option value="all">كل الأقسام</option>
+                <option v-for="cat in categories.slice(1)" :key="'banner-cat-' + cat.id" :value="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-prim mb-1">نص الزر الترويجي</label>
+            <input 
+              type="text" 
+              v-model="bannerForm.buttonText" 
+              placeholder="مثال: تسوق العرض الآن، اطلب بواتساب" 
+              class="w-full themed-input px-3 py-2 font-bold"
+            >
+          </div>
+
+          <div>
+            <label class="block font-bold text-prim mb-1">تفاصيل ووصف الإعلان</label>
+            <textarea 
+              v-model="bannerForm.description" 
+              rows="3" 
+              placeholder="أكتب تفاصيل العرض والخصومات والتوصيل..."
+              class="w-full themed-input px-3 py-2 font-medium"
+            ></textarea>
+          </div>
+
+          <!-- رفع وتحديد صورة الإعلان -->
+          <div>
+            <label class="block font-bold text-prim mb-1">صورة خلفية الإعلان 📷</label>
+            <div class="p-3.5 rounded-xl border border-dashed border-col tag-bg space-y-2.5">
+              
+              <!-- زر رفع الصورة من الجهاز -->
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="btn-primary px-4 py-2 rounded-xl text-xs font-black cursor-pointer inline-flex items-center gap-2 shadow hover:scale-105 transition">
+                  <i class="fas fa-camera text-sm"></i>
+                  <span>رفع صورة الإعلان من جهازك 📷</span>
+                  <input type="file" @change="handleBannerImageUpload" accept="image/*" class="hidden">
+                </label>
+                <span class="text-mut text-xs">أو ضع رابط صورة إنترنت</span>
+              </div>
+
+              <!-- حقل رابط الصورة -->
+              <input 
+                type="url" 
+                v-model="bannerForm.image" 
+                placeholder="https://... رابط صورة خارجي (اختياري)"
+                class="w-full themed-input px-3 py-2 font-mono text-left text-xs"
+                dir="ltr"
+              >
+
+              <!-- معاينة صورة الإعلان -->
+              <div v-if="bannerForm.image" class="relative h-28 rounded-xl overflow-hidden border border-col card-bg">
+                <img :src="bannerForm.image" class="w-full h-full object-cover">
+                <button 
+                  type="button" 
+                  @click="bannerForm.image = ''" 
+                  class="absolute top-2 left-2 bg-red-600 text-white rounded-lg px-2 py-1 text-[11px] font-bold shadow"
+                >
+                  <i class="fas fa-trash-alt mr-1"></i> إزالة
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- حالة الإعلان -->
+          <div class="py-1">
+            <label class="flex items-center gap-2 cursor-pointer font-bold text-prim">
+              <input type="checkbox" v-model="bannerForm.active" class="accent-amber-500">
+              <span>تفعيل هذا الإعلان فوراً وعرضه للمشترين في الموقع</span>
+            </label>
+          </div>
+
+          <div class="pt-3 border-t border-col flex items-center justify-end gap-2">
+            <button 
+              type="button" 
+              @click="isBannerModalOpen = false" 
+              class="tag-bg hover:opacity-80 text-prim px-4 py-2 rounded-xl font-bold"
+            >
+              إلغاء
+            </button>
+            <button 
+              type="submit" 
+              class="btn-primary px-6 py-2 rounded-xl font-black shadow-md"
+            >
+              {{ isBannerEditing ? 'حفظ تعديلات الإعلان' : 'نشر الإعلان فوراً 📢' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--            زر الواتساب العائم الذكي (Floating WhatsApp Button)            -->
+    <!-- ========================================================================= -->
+    <div 
+      @click="openGeneralWhatsApp" 
+      class="whatsapp-float-btn"
+      title="تواصل مباشرة مع متجر أبو السعود عبر واتساب: 01093178434"
+    >
+      <div class="whatsapp-pulse"></div>
+      <i class="fab fa-whatsapp"></i>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--                   إشعارات التنبيه (Toast Notifications)                  -->
+    <!-- ========================================================================= -->
+    <div class="toast-container">
+      <div 
+        v-for="toast in toasts" 
+        :key="toast.id" 
+        :class="[
+          'toast-msg px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs font-bold text-white max-w-sm',
+          toast.type === 'success' ? 'bg-emerald-600' : 
+          toast.type === 'warning' ? 'bg-amber-600' : 
+          toast.type === 'danger' ? 'bg-red-600' : 'bg-gray-900'
+        ]"
+      >
+        <i :class="[
+          'text-base',
+          toast.type === 'success' ? 'fas fa-check-circle' : 
+          toast.type === 'warning' ? 'fas fa-exclamation-triangle' : 
+          toast.type === 'danger' ? 'fas fa-times-circle' : 'fas fa-info-circle'
+        ]"></i>
+        <div>
+          <div>{{ toast.title }}</div>
+          <div v-if="toast.message" class="text-[11px] opacity-90 font-normal mt-0.5">{{ toast.message }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!--                       تذييل الموقع (Footer)                              -->
+    <!-- ========================================================================= -->
+    <footer class="footer-bg text-white border-t border-gray-800 mt-16 pt-12 pb-8">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div 
+                class="w-9 h-9 rounded-lg flex items-center justify-center font-black text-xl"
+                :style="{ backgroundColor: storeConfig.primaryColor, color: storeConfig.primaryTextColor }"
+              >
+                ن
+              </div>
+              <span class="text-xl font-black text-white">{{ storeConfig.storeName }}</span>
+            </div>
+            <p class="text-xs text-gray-400 leading-relaxed mb-4">
+              متجرك الإلكتروني الأول في مصر لجميع منتجات وملابس نون الأصلية مع ضمان التوصيل السريع وخدمة العملاء الفورية عبر الواتساب.
+            </p>
+            <div class="flex items-center gap-2">
+              <a :href="'https://wa.me/' + storeConfig.whatsappNumber" target="_blank" class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm hover:scale-110 transition">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+              <span class="text-xs font-bold text-gray-300">{{ storeConfig.whatsappNumber }}</span>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-black text-sm text-yellow-400 mb-3">أقسام الملابس والمتجر</h4>
+            <ul class="space-y-2 text-xs text-gray-400 font-medium">
+              <li v-for="cat in categories.slice(1)" :key="'footer-' + cat.id">
+                <a href="#" @click.prevent="selectedCategory = cat.id; switchToStore();" class="hover:text-white transition">
+                  {{ cat.name }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-black text-sm text-yellow-400 mb-3">روابط هامة</h4>
+            <ul class="space-y-2 text-xs text-gray-400 font-medium">
+              <li><a href="#" @click.prevent="switchToStore" class="hover:text-white transition">الرئيسية</a></li>
+              <li><a href="#" @click.prevent="switchToAdmin" class="hover:text-white transition">لوحة تحكم الأدمن وتغيير المظهر</a></li>
+              <li><a href="#" @click.prevent="openGeneralWhatsApp" class="hover:text-white transition">خدمة العملاء بواتساب</a></li>
+              <li><a href="#" @click.prevent="toggleDarkMode" class="hover:text-white transition">تبديل الوضع الليلي (Dark Mode)</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-black text-sm text-yellow-400 mb-3">طرق الدفع والتوصيل</h4>
+            <div class="flex flex-wrap gap-2 text-xl text-gray-400 mb-4">
+              <i class="fab fa-cc-visa hover:text-white"></i>
+              <i class="fab fa-cc-mastercard hover:text-white"></i>
+              <i class="fas fa-money-bill-wave text-green-400"></i>
+            </div>
+            <p class="text-[11px] text-gray-400">
+              الدفع عند الاستلام متاح لجميع الطلبات في كافة محافظات مصر مع إمكانية المعاينة قبل الاستلام.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-3">
+          <div class="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-right">
+            <p>© 2026 جميع الحقوق محفوظة لمتجر {{ storeConfig.storeName }} - مستوحى من تجربة نون مصر</p>
+            <span class="hidden sm:inline text-gray-700">•</span>
+            <p class="text-[11px] text-gray-400 font-medium">
+              تم عمل الموقع تحت إشراف <strong class="text-yellow-400 font-bold">المهندس حازم جلال</strong>
+            </p>
+          </div>
+          <p>واتساب الطلبات: <strong class="text-emerald-400">{{ storeConfig.whatsappNumber }}</strong></p>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

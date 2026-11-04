@@ -1,0 +1,24 @@
+{
+  "name": "abu-el-saud-store",
+  "version": "1.0.0",
+  "description": "متجر أبو السعود الإلكتروني بأسعار ومنتجات نون مع لوحة تحكم كاملة وربط واتساب",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "deploy": "npx wrangler pages deploy dist --project-name abu-el-saud-store"
+  },
+  "keywords": [
+    "noon",
+    "ecommerce",
+    "store",
+    "egypt",
+    "whatsapp-store",
+    "admin-dashboard"
+  ],
+  "author": "أبو السعود",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.3"
+  }
+}

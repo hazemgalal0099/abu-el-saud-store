@@ -1,0 +1,8 @@
+node_modules
+.git
+.wrangler
+server.js
+package.json
+package-lock.json
+*.log
+

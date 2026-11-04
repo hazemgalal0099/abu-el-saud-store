@@ -1,0 +1,392 @@
+/* =====================================================
+   متجر أبو السعود - الستايل الكامل مع دارك مود وتخصيص الألوان
+   ===================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap');
+
+/* ===================== CSS Variables (Light Mode Default) ===================== */
+:root {
+  --primary:        #feee00;
+  --primary-hover:  #e6d700;
+  --primary-text:   #1a1a1a;
+  --accent:         #25d366;
+  --accent-hover:   #1ebd5a;
+
+  --bg-base:        #f7f7fa;
+  --bg-card:        #ffffff;
+  --bg-nav:         #ffffff;
+  --bg-topbar:      #111827;
+  --bg-footer:      #111827;
+  --bg-input:       #f2f4f8;
+  --bg-tag:         #f8fafc;
+
+  --text-primary:   #111827;
+  --text-secondary: #404553;
+  --text-muted:     #7e859b;
+  --text-inverse:   #ffffff;
+
+  --border:         #e3e6e8;
+  --border-focus:   var(--primary);
+
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg:      0 12px 28px rgba(0,0,0,0.12);
+
+  --green:  #38ae04;
+  --red:    #d8143a;
+  --blue:   #0070e0;
+
+  --radius-card: 16px;
+  --radius-btn:  12px;
+  --font-main:   'Cairo', 'Tajawal', sans-serif;
+
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===================== Dark Mode ===================== */
+[data-theme="dark"] {
+  --bg-base:        #0d1117;
+  --bg-card:        #161b22;
+  --bg-nav:         #161b22;
+  --bg-topbar:      #090d12;
+  --bg-footer:      #090d12;
+  --bg-input:       #21262d;
+  --bg-tag:         #21262d;
+
+  --text-primary:   #e6edf3;
+  --text-secondary: #c9d1d9;
+  --text-muted:     #8b949e;
+
+  --border:         #30363d;
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:      0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:      0 12px 32px rgba(0,0,0,0.5);
+}
+
+/* ===================== Base ===================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-main);
+  direction: rtl;
+  text-align: right;
+  background-color: var(--bg-base);
+  color: var(--text-secondary);
+  overflow-x: hidden;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+[v-cloak] { display: none; }
+
+/* ===================== Scrollbar ===================== */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ===================== Utility Classes ===================== */
+.card-bg       { background-color: var(--bg-card); }
+.nav-bg        { background-color: var(--bg-nav); }
+.topbar-bg     { background-color: var(--bg-topbar); }
+.footer-bg     { background-color: var(--bg-footer); }
+.base-bg       { background-color: var(--bg-base); }
+.input-bg      { background-color: var(--bg-input); }
+.tag-bg        { background-color: var(--bg-tag); }
+
+.text-prim  { color: var(--text-primary); }
+.text-sec   { color: var(--text-secondary); }
+.text-mut   { color: var(--text-muted); }
+.border-col { border-color: var(--border); }
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-text);
+  font-weight: 800;
+  transition: all var(--transition);
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+
+.btn-whatsapp {
+  background-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  transition: all var(--transition);
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+}
+.btn-whatsapp:hover {
+  background-color: var(--accent-hover);
+  box-shadow: 0 4px 14px rgba(37,211,102,0.4);
+}
+
+/* ===================== Dark Mode Toggle Button ===================== */
+.dark-toggle {
+  width: 44px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.dark-toggle.active { background: var(--primary); }
+.dark-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.dark-toggle.active::after { transform: translateX(-20px); }
+
+/* ===================== Nav & Topbar ===================== */
+.main-nav {
+  background-color: var(--bg-nav);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.top-bar {
+  background-color: var(--bg-topbar);
+  color: var(--text-inverse);
+}
+
+/* ===================== Category Scroll ===================== */
+.category-scroll-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.category-scroll-container::-webkit-scrollbar { display: none; }
+
+/* ===================== Product Cards ===================== */
+.product-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background-color var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.product-card:hover .product-img {
+  transform: scale(1.06);
+}
+.card-img-wrapper {
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-input);
+}
+.product-img {
+  transition: transform 0.4s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===================== Badges ===================== */
+.noon-express-badge {
+  background: var(--primary);
+  color: var(--primary-text);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.discount-tag {
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* ===================== Hero Banner ===================== */
+.hero-banner {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 60%, #374151 100%);
+  position: relative;
+  overflow: hidden;
+}
+[data-theme="dark"] .hero-banner {
+  background: linear-gradient(135deg, #090d12 0%, #0d1117 60%, #161b22 100%);
+}
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(254,238,0,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ===================== WhatsApp Float ===================== */
+.whatsapp-float-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 999;
+  width: 62px;
+  height: 62px;
+  background-color: #25d366;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.45);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+.whatsapp-float-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 10px 28px rgba(37,211,102,0.65);
+}
+.whatsapp-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #25d366;
+  animation: pulse-wave 2s infinite;
+  pointer-events: none;
+}
+@keyframes pulse-wave {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+
+/* ===================== Toast ===================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast-msg {
+  pointer-events: auto;
+  animation: slideInRight 0.35s ease-out;
+}
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ===================== Inputs & Selects (dynamic theme) ===================== */
+.themed-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: border-color var(--transition), background-color var(--transition);
+  border-radius: 10px;
+}
+.themed-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--bg-card);
+}
+
+/* ===================== Admin Table ===================== */
+.admin-table th {
+  background-color: var(--bg-tag);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 12px;
+}
+.admin-table tr { transition: background-color 0.15s ease; }
+.admin-table tr:hover { background-color: var(--bg-input); }
+.admin-table td { border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+
+/* ===================== Modal ===================== */
+.modal-backdrop {
+  background-color: rgba(0,0,0,0.65);
+  backdrop-filter: blur(5px);
+}
+
+/* ===================== Color Swatches (Admin Theme Panel) ===================== */
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+  display: inline-block;
+}
+.color-swatch.selected,
+.color-swatch:hover {
+  border-color: var(--text-primary);
+  transform: scale(1.15);
+}
+
+/* ===================== Clothing Size Chips ===================== */
+.size-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.size-chip:hover, .size-chip.active {
+  background: var(--primary);
+  color: var(--primary-text);
+  border-color: var(--primary);
+}
+
+/* ===================== Category Nav Pill Active ===================== */
+.cat-pill-active {
+  background-color: var(--primary) !important;
+  color: var(--primary-text) !important;
+  font-weight: 900;
+}
+.cat-pill {
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  transition: background-color var(--transition), color var(--transition);
+  white-space: nowrap;
+  font-weight: 700;
+}
+.cat-pill:hover { background-color: var(--border); }
+
+/* ===================== Clothing-specific badge colors ===================== */
+.badge-men     { background: #1e40af; color: #fff; }
+.badge-women   { background: #9d174d; color: #fff; }
+.badge-kids    { background: #15803d; color: #fff; }
+.badge-sport   { background: #b45309; color: #fff; }
+.badge-newIn   { background: #7c3aed; color: #fff; }
+.badge-sale    { background: #dc2626; color: #fff; }
